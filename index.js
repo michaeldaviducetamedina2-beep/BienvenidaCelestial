@@ -1,9 +1,9 @@
-const { Client, GatewayIntentBits, Partials, PermissionsBitField } = require("discord.js");
+const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const express = require("express");
-
-// ---- SERVIDOR EXPRESS PARA QUE EL BOT NO SE APAGUE ----
 const app = express();
-app.get("/", (req, res) => res.send("Bot funcionando correctamente ✝️🔥"));
+
+// Página para que Render NO APAGUE el bot
+app.get("/", (req, res) => res.send("Bot funcionando en Render"));
 app.listen(process.env.PORT || 3000);
 
 // ---- INICIALIZAR BOT ----
@@ -14,7 +14,7 @@ const bot = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent
   ],
-  partials: [Partials.Channel]
+  partials: [Partials.Channel, Partials.Message, Partials.GuildMember]
 });
 
 // ---- CUANDO EL BOT INICIA ----
@@ -26,7 +26,7 @@ bot.on("ready", () => {
   });
 });
 
-// ---- MENSAJE DE BIENVENIDA ----
+// ---- BIENVENIDA ----
 bot.on("guildMemberAdd", member => {
   const canal = member.guild.systemChannel;
   if (!canal) return;
@@ -65,14 +65,13 @@ bot.on("messageCreate", msg => {
     );
   }
 
-  // !limpiar
+  // !limpiar (solo moderadores)
   if (msg.content.startsWith("!limpiar")) {
-    if (!msg.member.permissions.has(PermissionsBitField.Flags.ManageMessages))
+    if (!msg.member.permissions.has("ManageMessages"))
       return msg.reply("❌ No tienes permiso para limpiar mensajes.");
 
     const cantidad = parseInt(msg.content.split(" ")[1]);
-    if (!cantidad || cantidad < 1)
-      return msg.reply("Escribe cuántos mensajes borrar.");
+    if (!cantidad) return msg.reply("Escribe cuántos mensajes borrar.");
 
     msg.channel.bulkDelete(cantidad, true);
     msg.channel.send(`🧹 Se borraron **${cantidad}** mensajes.`);
@@ -80,4 +79,4 @@ bot.on("messageCreate", msg => {
 });
 
 // ---- INICIAR BOT ----
-bot.login(process.env.TOKEN || "AQUÍ_PARA_PROBAR_LOCAL");
+bot.login(process.env.TOKEN);
