@@ -1,10 +1,10 @@
-const { Client, GatewayIntentBits, Partials, PermissionsBitField } = require("discord.js");
+const { Client, GatewayIntentBits } = require("discord.js");
 const express = require("express");
-
-// ---- SERVIDOR EXPRESS PARA MANTENER EL BOT ACTIVO ----
 const app = express();
-app.get("/", (req, res) => res.send("Bot funcionando correctamente ✝️🔥"));
-app.listen(process.env.PORT || 3000);
+
+// Servidor Express para mantener bot activo
+app.get("/", (req, res) => res.send("Bot funcionando"));
+app.listen(3000);
 
 // ---- INICIALIZAR BOT ----
 const bot = new Client({
@@ -13,8 +13,7 @@ const bot = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent
-  ],
-  partials: [Partials.Channel]
+  ]
 });
 
 // ---- CUANDO EL BOT INICIA ----
@@ -26,7 +25,7 @@ bot.on("ready", () => {
   });
 });
 
-// ---- MENSAJE DE BIENVENIDA ----
+// ---- BIENVENIDA ----
 bot.on("guildMemberAdd", member => {
   const canal = member.guild.systemChannel;
   if (!canal) return;
@@ -36,10 +35,19 @@ bot.on("guildMemberAdd", member => {
   );
 });
 
-// ---- COMANDOS ----
+// ---- FILTRO DE GROSERÍAS ----
+const badWords = ["puta", "mierda", "grosería1", "grosería2"];
 bot.on("messageCreate", msg => {
-  if (msg.author.bot) return;
+  if(msg.author.bot) return;
 
+  const found = badWords.some(word => msg.content.toLowerCase().includes(word));
+  if(found){
+    msg.delete().catch(console.error);
+    msg.channel.send(`${msg.author}, por favor no uses groserías 🙏`);
+    return; // Salir para no ejecutar otros comandos
+  }
+
+  // ---- COMANDOS ----
   // !versiculo
   if (msg.content === "!versiculo") {
     const vers = [
@@ -67,12 +75,11 @@ bot.on("messageCreate", msg => {
 
   // !limpiar
   if (msg.content.startsWith("!limpiar")) {
-    if (!msg.member.permissions.has(PermissionsBitField.Flags.ManageMessages))
+    if (!msg.member.permissions.has("ManageMessages"))
       return msg.reply("❌ No tienes permiso para limpiar mensajes.");
 
     const cantidad = parseInt(msg.content.split(" ")[1]);
-    if (!cantidad || cantidad < 1)
-      return msg.reply("Escribe cuántos mensajes borrar.");
+    if (!cantidad) return msg.reply("Escribe cuántos mensajes borrar.");
 
     msg.channel.bulkDelete(cantidad, true);
     msg.channel.send(`🧹 Se borraron **${cantidad}** mensajes.`);
