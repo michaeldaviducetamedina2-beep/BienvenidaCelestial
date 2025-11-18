@@ -1,149 +1,83 @@
-const Discord = require("discord.js");
-const chalk = require("chalk");
-const fs = require("fs");
-const path = require("path");
-require("dotenv").config();
-const { logError, logWarning } = require("./src/utils/functions");
+const { Client, GatewayIntentBits, Partials, PermissionsBitField } = require("discord.js");
+const express = require("express");
 
-// ? Discord Client Constructor
+// ---- SERVIDOR EXPRESS PARA QUE EL BOT NO SE APAGUE ----
+const app = express();
+app.get("/", (req, res) => res.send("Bot funcionando correctamente ✝️🔥"));
+app.listen(process.env.PORT || 3000);
 
-const client = new Discord.Client({
-    intents: [Discord.GatewayIntentBits.Guilds, Discord.GatewayIntentBits.GuildMessages, Discord.GatewayIntentBits.MessageContent],
-    presence: {
-        activities: [
-            {
-                name: `Github.com/iTzArshia`,
-                type: Discord.ActivityType.Watching,
-            },
-        ],
-        status: "online",
-    },
+// ---- INICIALIZAR BOT ----
+const bot = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
+  ],
+  partials: [Partials.Channel]
 });
 
-client.contextMenuCommands = new Discord.Collection();
-client.slashCommands = new Discord.Collection();
-client.prefixCommands = new Discord.Collection();
-client.contextMenuCommandsCooldowns = new Discord.Collection();
-client.slashCommandsCooldowns = new Discord.Collection();
-client.prefixCommandsCooldowns = new Discord.Collection();
-
-// ? Handlers
-// ? Event Handler
-
-const eventsPath = path.join(__dirname, "src", "events");
-const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
-
-for (const file of eventFiles) {
-    const filePath = path.join(eventsPath, file);
-    const event = require(filePath);
-
-    if ("name" in event && "execute" in event) {
-        const callBack = (...args) => event.execute(client, ...args);
-        if (event.once) {
-            client.once(event.name, callBack);
-        } else {
-            client.on(event.name, callBack);
-        }
-    } else {
-        if (!("name" in event) && !("execute" in event))
-            console.log(chalk.yellowBright(`[WARNING] :: The event at "${filePath}" is missing a required "name" and "execute" property.`));
-        else if (!("name" in event))
-            console.log(chalk.yellowBright(`[WARNING] :: The event at "${filePath}" is missing a required "name" property.`));
-        else if (!("execute" in event))
-            console.log(chalk.yellowBright(`[WARNING] :: The event at "${filePath}" is missing a required "execute" property.`));
-    }
-}
-
-// ? Context Menu Commands Handler
-
-const contextMenuCommandsPath = path.join(__dirname, "src", "commands", "context_menu");
-const contextMenuCommandFiles = fs.readdirSync(contextMenuCommandsPath).filter((file) => file.endsWith(".js"));
-
-for (const file of contextMenuCommandFiles) {
-    const filePath = path.join(contextMenuCommandsPath, file);
-    const command = require(filePath);
-
-    if ("data" in command && "execute" in command) {
-        client.contextMenuCommands.set(command.data.name, command);
-    } else {
-        if (!("data" in command) && !("execute" in command))
-            console.log(chalk.yellowBright(`[WARNING] :: The command at "${filePath}" is missing a required "data" and "execute" property.`));
-        else if (!("data" in command))
-            console.log(chalk.yellowBright(`[WARNING] :: The command at "${filePath}" is missing a required "data" property.`));
-        else if (!("execute" in command))
-            console.log(chalk.yellowBright(`[WARNING] :: The command at "${filePath}" is missing a required "execute" property.`));
-    }
-}
-
-// ? Slash Commands Handler
-
-const slashCommandsPath = path.join(__dirname, "src", "commands", "slash");
-const slashCommandFiles = fs.readdirSync(slashCommandsPath).filter((file) => file.endsWith(".js"));
-
-for (const file of slashCommandFiles) {
-    const filePath = path.join(slashCommandsPath, file);
-    const command = require(filePath);
-
-    if ("data" in command && "execute" in command) {
-        client.slashCommands.set(command.data.name, command);
-    } else {
-        if (!("data" in command) && !("execute" in command))
-            console.log(chalk.yellowBright(`[WARNING] :: The command at "${filePath}" is missing a required "data" and "execute" property.`));
-        else if (!("data" in command))
-            console.log(chalk.yellowBright(`[WARNING] :: The command at "${filePath}" is missing a required "data" property.`));
-        else if (!("execute" in command))
-            console.log(chalk.yellowBright(`[WARNING] :: The command at "${filePath}" is missing a required "execute" property.`));
-    }
-}
-
-// ? Prefix Commands Handler
-
-const prefixCommandsPath = path.join(__dirname, "src", "commands", "prefix");
-const prefixCommandFiles = fs.readdirSync(prefixCommandsPath).filter((file) => file.endsWith(".js"));
-
-for (const file of prefixCommandFiles) {
-    const filePath = path.join(prefixCommandsPath, file);
-    const command = require(filePath);
-
-    if ("name" in command && "execute" in command) {
-        client.prefixCommands.set(command.name.toLowerCase(), command);
-    } else {
-        if (!("name" in command) && !("execute" in command))
-            console.log(chalk.yellowBright(`[WARNING] :: The command at "${filePath}" is missing a required "name" and "execute" property.`));
-        else if (!("name" in command))
-            console.log(chalk.yellowBright(`[WARNING] :: The command at "${filePath}" is missing a required "name" property.`));
-        else if (!("execute" in command))
-            console.log(chalk.yellowBright(`[WARNING] :: The command at "${filePath}" is missing a required "execute" property.`));
-    }
-}
-
-// ? Anti Cras
-
-process.on("unhandledRejection", (reason, promise) => {
-    console.error(chalk.redBright("[Anti Crash] :: Unhandled Rejection/Catch"));
-    logError(reason);
+// ---- CUANDO EL BOT INICIA ----
+bot.on("ready", () => {
+  console.log(`Bot activo como: ${bot.user.tag}`);
+  bot.user.setPresence({
+    activities: [{ name: "Jesús te ama | IPULRD ✝️🔥" }],
+    status: "online"
+  });
 });
 
-process.on("uncaughtException", (error, origin) => {
-    console.error(chalk.redBright("[Anti Crash] :: Uncaught Exception/Catch"));
-    logError(error);
+// ---- MENSAJE DE BIENVENIDA ----
+bot.on("guildMemberAdd", member => {
+  const canal = member.guild.systemChannel;
+  if (!canal) return;
+
+  canal.send(
+    `🙌 **Dios te bendiga, ${member.user.username}**\nBienvenido/a a la familia cristiana ✝️🔥`
+  );
 });
 
-process.on("warning", (warning) => {
-    console.warn(chalk.yellowBright("[Anti Crash] :: Warning"));
-    logWarning(warning);
+// ---- COMANDOS ----
+bot.on("messageCreate", msg => {
+  if (msg.author.bot) return;
+
+  // !versiculo
+  if (msg.content === "!versiculo") {
+    const vers = [
+      "📖 *Jehová es mi pastor; nada me faltará.* — Salmos 23:1",
+      "📖 *Todo lo puedo en Cristo que me fortalece.* — Filipenses 4:13",
+      "📖 *Jehová es mi luz y mi salvación; ¿de quién temeré?* — Salmos 27:1",
+      "📖 *Clama a mí y yo te responderé.* — Jeremías 33:3"
+    ];
+    msg.reply(vers[Math.floor(Math.random() * vers.length)]);
+  }
+
+  // !oracion
+  if (msg.content === "!oracion") {
+    msg.reply(
+      "🙏 *Señor, bendice a este joven. Guíalo, fortalécelo y cúbrelo con tu paz. Amén.*"
+    );
+  }
+
+  // !ipul
+  if (msg.content === "!ipul") {
+    msg.reply(
+      "🔥 *La Iglesia Pentecostal Unida Latinoamericana (IPUL) proclama el bautismo en el Nombre de Jesús, la santidad y el poder del Espíritu Santo.*"
+    );
+  }
+
+  // !limpiar
+  if (msg.content.startsWith("!limpiar")) {
+    if (!msg.member.permissions.has(PermissionsBitField.Flags.ManageMessages))
+      return msg.reply("❌ No tienes permiso para limpiar mensajes.");
+
+    const cantidad = parseInt(msg.content.split(" ")[1]);
+    if (!cantidad || cantidad < 1)
+      return msg.reply("Escribe cuántos mensajes borrar.");
+
+    msg.channel.bulkDelete(cantidad, true);
+    msg.channel.send(`🧹 Se borraron **${cantidad}** mensajes.`);
+  }
 });
 
-process.on("SIGINT", () => {
-    console.log(chalk.cyanBright("[Process] :: Received SIGINT. Shutting down gracefully..."));
-    process.exit(0);
-});
-
-process.on("SIGTERM", () => {
-    console.log(chalk.cyanBright("[Process] :: Received SIGTERM. Shutting down gracefully..."));
-    process.exit(0);
-});
-
-// ? Login to Discord Client
-
-client.login(process.env.BOT_TOKEN);
+// ---- INICIAR BOT ----
+bot.login(process.env.TOKEN || "AQUÍ_PARA_PROBAR_LOCAL");
