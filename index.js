@@ -113,7 +113,7 @@ bot.on("messageCreate", async msg => {
     return;
   }
 
-  // --- GOSPEL AI: PREGUNTAS ---
+  // --- GOSPEL AI: PREGUNTAS ----
   if (msg.content.startsWith("!preguntar")) {
     const pregunta = msg.content.replace("!preguntar", "").trim();
 
@@ -124,7 +124,7 @@ bot.on("messageCreate", async msg => {
     msg.channel.send("⏳ Orando y buscando sabiduría... ✝️");
 
     try {
-      // ---- CHAT COMPLETIONS CON TEMPERATURE PARA RESPUESTAS DINÁMICAS ----
+      // ---- Aquí está la corrección para respuestas dinámicas y sin repetirse ----
       const respuesta = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
@@ -133,11 +133,10 @@ bot.on("messageCreate", async msg => {
             content: `Responde como un consejero cristiano pentecostal amable de la IPULRD: ${pregunta}`
           }
         ],
-        temperature: 0.8,
-        top_p: 0.9
+        temperature: 0.8
       });
 
-      const texto = respuesta.choices[0].message.content;
+      const texto = respuesta.choices[0].message.content.trim(); // <- solo una vez
       msg.reply("📖 **Respuesta basada en la Biblia:**\n" + texto);
 
     } catch (err) {
