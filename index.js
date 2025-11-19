@@ -115,8 +115,7 @@ bot.on("messageCreate", async msg => {
 
   // --- GOSPEL AI: PREGUNTAS ---
   if (msg.content.startsWith("!preguntar")) {
-    // 🔹 CORRECCIÓN: tomar solo la pregunta después del comando
-    const pregunta = msg.content.slice("!preguntar".length).trim();
+    const pregunta = msg.content.replace("!preguntar", "").trim();
 
     if (!pregunta) {
       return msg.reply("✝️ Escribe una pregunta. Ejemplo: `!preguntar ¿Qué significa tener fe?`");
@@ -125,14 +124,22 @@ bot.on("messageCreate", async msg => {
     msg.channel.send("⏳ Orando y buscando sabiduría... ✝️");
 
     try {
-      const respuesta = await openai.responses.create({
-        model: "gpt-4.1-mini",
-        input: `Responde como un consejero cristiano pentecostal amable de la IPULRD: ${pregunta}`
+      // ---- CHAT COMPLETIONS CON TEMPERATURE PARA RESPUESTAS DINÁMICAS ----
+      const respuesta = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "user",
+            content: `Responde como un consejero cristiano pentecostal amable de la IPULRD: ${pregunta}`
+          }
+        ],
+        temperature: 0.8,
+        top_p: 0.9
       });
 
-      const texto = respuesta.output[0].content[0].text;
-
+      const texto = respuesta.choices[0].message.content;
       msg.reply("📖 **Respuesta basada en la Biblia:**\n" + texto);
+
     } catch (err) {
       console.error(err);
       msg.reply("❌ Hubo un error buscando la respuesta, mi hermano.");
