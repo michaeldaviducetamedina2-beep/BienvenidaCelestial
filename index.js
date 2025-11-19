@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, Partials, PermissionsBitField, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { Client, GatewayIntentBits, Partials, PermissionsBitField, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require("discord.js");
 const express = require("express");
 
 // ---- SERVIDOR EXPRESS PARA QUE EL BOT NO SE APAGUE ----
@@ -32,7 +32,17 @@ bot.on("guildMemberAdd", member => {
   const canalReglas = bot.channels.cache.get("1440511929566232676"); // <- ID canal de reglas
   if (!canalBienvenida || !canalReglas) return;
 
-  // Mensaje normal de bienvenida mencionando al usuario
+  // ==== EMBED DE BIENVENIDA ====
+  const embedBienvenida = new EmbedBuilder()
+    .setTitle("🙌 ¡Dios te bendiga!")
+    .setDescription(`Bienvenido/a **${member}** ✝️🔥\nEres parte de una familia en Cristo. ¡Nos alegra que estés aquí!`)
+    .setColor("#2ECC71")
+    .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+    .setFooter({ text: "IPUL República Dominicana ✝️" });
+
+  canalBienvenida.send({ embeds: [embedBienvenida] });
+
+  // Mensaje normal de bienvenida
   canalBienvenida.send(
     `🙌 **Dios te bendiga, ${member}**\n¡Dios te bendiga! ¡Bienvenido/a a la familia de hermanos en Cristo! ✝️🔥`
   );
@@ -84,7 +94,7 @@ bot.on("messageCreate", msg => {
   const palabrasProhibidas = [
     "verga", "vrg", "puta", "mierda", "fuck", "shit", "pendejo", "idiota", 
     "imbecil", "cabron", "culero", "maldito", "penis", "vagina",
-    "xxx", "sex", "sexo", "puta madre", "asshole", "bitch", "mrd", "hdp", "maricon", "callate", "mamahuevo", "mmg"   // "chatgpt" no será censurado
+    "xxx", "sex", "sexo", "puta madre", "asshole", "bitch", "mrd", "hdp", "maricon", "callate", "mamahuevo", "mmg"
   ];
 
   const mensajeMinuscula = msg.content.toLowerCase();
@@ -143,28 +153,28 @@ bot.on("messageCreate", msg => {
     msg.channel.send(`🧹 Se borraron **${cantidad}** mensajes.`);
   }
 
-  // ---- COMANDO !cmds ----
+  // !cmds
   if (msg.content === "!cmds") {
     const comandos = [
       "!versiculo - Te da un versículo aleatorio",
       "!oracion - Te da una oración aleatoria",
       "!ipul - Información sobre la iglesia",
-      "!limpiar [cantidad] - Borra mensajes (requiere permisos)",
-      "!saludo - El bot te saluda",
-      "!ayuda - Información de ayuda del bot",
+      "!limpiar [cantidad] - Borra mensajes (permiso requerido)",
+      "!saludo - Un saludo del bot",
+      "!ayuda - Info de ayuda",
       "!cmds - Lista todos los comandos"
     ];
     msg.reply("📜 **Comandos disponibles:**\n" + comandos.join("\n"));
   }
 
-  // ---- COMANDO !saludo
-  if (msg.content === "!saludo") {
+  // !saludo
+  if (msg.content === ";!saludo") {
     msg.reply("👋 ¡Hola! Que Dios te bendiga hoy y siempre ✝️");
   }
 
-  // ---- COMANDO !ayuda
+  // !ayuda
   if (msg.content === "!ayuda") {
-    msg.reply("💡 Usa !cmds para ver todos los comandos y funciones del bot.");
+    msg.reply("💡 Usa !cmds para ver todos los comandos del bot.");
   }
 });
 
