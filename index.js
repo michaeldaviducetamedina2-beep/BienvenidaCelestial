@@ -32,9 +32,9 @@ bot.on("guildMemberAdd", member => {
   const canalReglas = bot.channels.cache.get("1440511929566232676"); // <- ID canal de reglas
   if (!canalBienvenida || !canalReglas) return;
 
-  // Mensaje normal de bienvenida
+  // Mensaje normal de bienvenida mencionando al usuario
   canalBienvenida.send(
-    `🙌 **Dios te bendiga, ${member.user.username}**\n¡Dios te bendiga! ¡Bienvenido/a a la familia de hermanos en Cristo! ✝️🔥`
+    `🙌 **Dios te bendiga, ${member}**\n¡Dios te bendiga! ¡Bienvenido/a a la familia de hermanos en Cristo! ✝️🔥`
   );
 
   // Botón que lleva a las reglas
@@ -64,6 +64,16 @@ bot.on("guildMemberAdd", member => {
       components: [filaReglas]
     });
   }
+});
+
+// ---- MENSAJE DE DESPEDIDA ----
+bot.on("guildMemberRemove", member => {
+  const canalDespedida = bot.channels.cache.get("1440511965276409918"); // <- Pega aquí el ID de tu canal de despedida
+  if (!canalDespedida) return;
+
+  canalDespedida.send(
+    `😢 ${member.user.tag} ha salido del servidor. Que Dios lo bendiga y lo guíe siempre ✝️🙏`
+  );
 });
 
 // ---- COMANDOS ----
@@ -131,6 +141,30 @@ bot.on("messageCreate", msg => {
 
     msg.channel.bulkDelete(cantidad, true);
     msg.channel.send(`🧹 Se borraron **${cantidad}** mensajes.`);
+  }
+
+  // ---- COMANDO !cmds ----
+  if (msg.content === "!cmds") {
+    const comandos = [
+      "!versiculo - Te da un versículo aleatorio",
+      "!oracion - Te da una oración aleatoria",
+      "!ipul - Información sobre la iglesia",
+      "!limpiar [cantidad] - Borra mensajes (requiere permisos)",
+      "!saludo - El bot te saluda",
+      "!ayuda - Información de ayuda del bot",
+      "!cmds - Lista todos los comandos"
+    ];
+    msg.reply("📜 **Comandos disponibles:**\n" + comandos.join("\n"));
+  }
+
+  // ---- COMANDO !saludo
+  if (msg.content === "!saludo") {
+    msg.reply("👋 ¡Hola! Que Dios te bendiga hoy y siempre ✝️");
+  }
+
+  // ---- COMANDO !ayuda
+  if (msg.content === "!ayuda") {
+    msg.reply("💡 Usa !cmds para ver todos los comandos y funciones del bot.");
   }
 });
 
