@@ -113,35 +113,31 @@ bot.on("messageCreate", async msg => {
     return;
   }
 
-  // ============================================================
-  // ⭐ GOSPEL AI — RESPUESTAS BÍBLICAS CON !a
-  // ============================================================
-  if (msg.content.startsWith("!a")) {
-
-    const pregunta = msg.content.replace("!a", "").trim();
+  // --- GOSPEL AI: PREGUNTAS ---
+  // === AQUÍ ESTÁ TU GOSPEL AI ===
+  if (msg.content.startsWith("!preguntar")) {
+    const pregunta = msg.content.replace("!preguntar", "").trim();
 
     if (!pregunta) {
-      return msg.reply("✝️ Escribe tu pregunta después de **!a**.\nEjemplo: `!a ¿Qué significa tener fe?`");
+      return msg.reply("✝️ Escribe una pregunta. Ejemplo: `!preguntar ¿Qué significa tener fe?`");
     }
 
-    msg.channel.send("⏳ Buscando sabiduría en el Señor... ✝️");
+    msg.channel.send("⏳ Orando y buscando sabiduría... ✝️");
 
     try {
       const respuesta = await openai.responses.create({
         model: "gpt-4.1-mini",
-        input: `Responde como un consejero cristiano pentecostal amable de la IPULRD, usando Biblia y palabras que edifiquen: ${pregunta}`
+        input: `Responde como un consejero cristiano pentecostal amable de la IPULRD: ${pregunta}`
       });
 
       const texto = respuesta.output[0].content[0].text;
 
-      msg.reply("📖 **Respuesta basada en la Palabra:**\n" + texto);
-
+      msg.reply("📖 **Respuesta basada en la Biblia:**\n" + texto);
     } catch (err) {
       console.error(err);
       msg.reply("❌ Hubo un error buscando la respuesta, mi hermano.");
     }
   }
-  // ============================================================
 
   // --- COMANDOS YA EXISTENTES ---
   if (msg.content === "!versiculo") {
@@ -165,7 +161,7 @@ bot.on("messageCreate", async msg => {
   }
 
   if (msg.content === "!ipul") {
-    msg.reply("🔥 La IPUL predica el Nombre de Jesús y la santidad en el Espíritu Santo.");
+    msg.reply("🔥 La Iglesia Pentecostal Unida Latinoamericana (IPUL) enseña la importancia del bautismo en el Nombre de Jesús, la santidad personal y vivir guiados por el Espíritu Santo. Nuestra misión es compartir el evangelio y ayudar a todos a acercarse a Cristo.");
   }
 
   if (msg.content.startsWith("!limpiar")) {
@@ -181,7 +177,7 @@ bot.on("messageCreate", async msg => {
   }
 
   if (msg.content === "!cmds") {
-    msg.reply("📜 **Comandos:**\n!versiculo\n!oracion\n!ipul\n!limpiar\n!saludo\n!ayuda\n!cmds\n!a <tu pregunta>");
+    msg.reply("📜 **Comandos:**\n!versiculo\n!oracion\n!ipul\n!limpiar\n!saludo\n!ayuda\n!cmds\n!preguntar <tu pregunta>");
   }
 
   if (msg.content === "!saludo") {
@@ -195,3 +191,13 @@ bot.on("messageCreate", async msg => {
 
 // ---- BOT LOGIN ----
 bot.login(process.env.TOKEN || "AQUÍ_PARA_PROBAR_LOCAL");
+
+
+
+
+// ==============================
+// ⚠️ EXTRA AÑADIDO (SIN CAMBIAR NADA)
+// Esto es SOLO para que Render no crashee
+// ==============================
+process.on("uncaughtException", err => console.log("Error controlado:", err));
+process.on("unhandledRejection", err => console.log("Promesa rechazada:", err));
