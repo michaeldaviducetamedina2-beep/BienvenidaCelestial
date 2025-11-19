@@ -32,7 +32,7 @@ bot.on("guildMemberAdd", member => {
   if (!canal) return;
 
   canal.send(
-    `🙌 **Dios te bendiga, ${member.user.username}**\nBienvenido/a a la familia cristiana ✝️🔥`
+    `🙌 **Dios te bendiga, ${member.user.username}**\n¡Dios te bendiga! ¡Bienvenido/a a la familia de hermanos en Cristo! ✝️🔥`
   );
 });
 
@@ -43,8 +43,8 @@ bot.on("messageCreate", msg => {
   // ---- FILTRO DE PALABRAS ----
   const palabrasProhibidas = [
     "verga", "vrg", "puta", "mierda", "fuck", "shit", "pendejo", "idiota", 
-    "imbecil", "cabron", "culero", "maldito", "culo", "penis", "vagina",
-    "xxx", "sex", "sexo", "puta madre", "asshole", "bitch", "mrd", "hdp", "maricon", "callate", "mamahuevo", "mmg", "clo", "chatgpt" // "chatgpt" no será censurado
+    "imbecil", "cabron", "culero", "maldito", "penis", "vagina",
+    "xxx", "sex", "sexo", "puta madre", "asshole", "bitch", "mrd", "hdp", "maricon", "callate", "mamahuevo", "mmg"   // "chatgpt" no será censurado
   ];
 
   const mensajeMinuscula = msg.content.toLowerCase();
