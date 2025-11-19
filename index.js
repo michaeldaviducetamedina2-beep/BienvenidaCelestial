@@ -28,7 +28,7 @@ bot.on("ready", () => {
 
 // ---- MENSAJE DE BIENVENIDA ----
 bot.on("guildMemberAdd", member => {
-  const canal = member.guild.systemChannel;
+  const canal = bot.channels.cache.get("1440511721205661706"); // <- Pega aquí el ID de tu canal
   if (!canal) return;
 
   canal.send(
@@ -40,20 +40,35 @@ bot.on("guildMemberAdd", member => {
 bot.on("messageCreate", msg => {
   if (msg.author.bot) return;
 
+  // ---- FILTRO DE PALABRAS ----
+  const palabrasProhibidas = [
+    "verga", "vrg", "puta", "mierda", "fuck", "shit", "pendejo", "idiota", 
+    "imbecil", "cabron", "culero", "maldito", "culo", "penis", "vagina",
+    "xxx", "sex", "sexo", "puta madre", "asshole", "bitch", "mrd", "hdp", "maricon", "callate", "mamahuevo", "mmg", "clo", "chatgpt" // "chatgpt" no será censurado
+  ];
+
+  const mensajeMinuscula = msg.content.toLowerCase();
+  if (palabrasProhibidas.some(p => mensajeMinuscula.includes(p))) {
+    msg.delete().catch(() => {});
+    const respuestasCristianas = [
+      "🙏 Por favor, use palabras amables y cristianas ✝️",
+      "✨ Recordemos hablar con respeto y amor en Cristo.",
+      "✝️ Mantengamos un lenguaje limpio, en el nombre de Jesús.",
+      "🌿 Hablemos con palabras que edifiquen."
+    ];
+    const respuesta = respuestasCristianas[Math.floor(Math.random() * respuestasCristianas.length)];
+    msg.channel.send(respuesta);
+    return;
+  }
+
   // !versiculo
   if (msg.content === "!versiculo") {
     const vers = [
       "📖 Jehová es mi pastor; nada me faltará. — Salmos 23:1",
       "📖 Todo lo puedo en Cristo que me fortalece. — Filipenses 4:13",
       "📖 Jehová es mi luz y mi salvación; ¿de quién temeré? — Salmos 27:1",
-      "📖 Clama a mí y yo te responderé. — Jeremías 33:3",
-      "📖 Porque yo sé los planes que tengo acerca de vosotros, dice Jehová, planes de bien y no de mal, para daros un futuro y una esperanza. — Jeremías 29:11",
-      "📖 Buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas. — Mateo 6:33",
-      "📖 No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo. — Isaías 41:10",
-      "📖 Y conoceréis la verdad, y la verdad os hará libres. — Juan 8:32",
-      "📖 Amad a vuestros enemigos, haced bien a los que os aborrecen. — Lucas 6:27",
-      "📖 Bienaventurados los que tienen hambre y sed de justicia, porque ellos serán saciados. — Mateo 5:6"
-      // Agrega más versículos según quieras
+      "📖 Clama a mí y yo te responderé. — Jeremías 33:3"
+      // Puedes añadir más versículos aquí
     ];
     msg.reply(vers[Math.floor(Math.random() * vers.length)]);
   }
@@ -61,14 +76,11 @@ bot.on("messageCreate", msg => {
   // !oracion
   if (msg.content === "!oracion") {
     const oraciones = [
-      "🙏 Señor, bendice a este joven, guíalo y cúbrelo con tu paz en el nombre de Jesús, amén.",
-      "🙏 Padre celestial, fortalece su fe y protégelo en el nombre de nuestro Señor Jesucristo, amén.",
-      "🙏 Dios todopoderoso, ilumina su camino y bendice sus pasos en el nombre de Jesús, amén.",
-      "🙏 Señor Jesús, que tu Espíritu Santo lo guíe y lo llene de sabiduría, amén.",
-      "🙏 Padre amado, escucha su corazón y dale fuerzas cada día en el nombre de nuestro Señor Jesucristo, amén.",
-      "🙏 Dios de amor, que tu paz repose sobre él y su familia en el nombre de Jesús, amén.",
-      "🙏 Señor, límpialo de toda tentación y guárdalo de todo mal en el nombre de Jesús, amén."
-      // Puedes agregar más frases de oración según quieras
+      "🙏 Señor, bendice a este joven, guíalo, fortalécelo y cúbrelo con tu paz, en el nombre de Jesús, amén.",
+      "🙏 Padre Celestial, protégenos y acompáñanos en cada paso que damos, en el nombre de nuestro Señor Jesucristo, amén.",
+      "🙏 Que Tu luz ilumine nuestro camino, que Tu amor nos guíe, en el nombre de Jesús, amén.",
+      "🙏 Señor, gracias por tu misericordia y tu gracia, ayúdanos a caminar rectamente, en el nombre de nuestro Señor Jesucristo, amén."
+      // Puedes añadir más oraciones aquí
     ];
     msg.reply(oraciones[Math.floor(Math.random() * oraciones.length)]);
   }
@@ -76,7 +88,7 @@ bot.on("messageCreate", msg => {
   // !ipul
   if (msg.content === "!ipul") {
     msg.reply(
-      "🔥 La Iglesia Pentecostal Unida Latinoamericana (IPUL) es una comunidad cristiana dedicada a enseñar la Palabra de Dios, vivir en santidad, predicar el evangelio de Jesús y guiar a los jóvenes hacia una vida con Cristo, con amor y obediencia al Espíritu Santo."
+      "🔥 La Iglesia Pentecostal Unida Latinoamericana (IPUL) enseña la importancia del bautismo en el Nombre de Jesús, la santidad personal y vivir guiados por el Espíritu Santo. Nuestra misión es compartir el evangelio y ayudar a todos a acercarse a Cristo."
     );
   }
 
@@ -91,30 +103,6 @@ bot.on("messageCreate", msg => {
 
     msg.channel.bulkDelete(cantidad, true);
     msg.channel.send(`🧹 Se borraron **${cantidad}** mensajes.`);
-  }
-
-  // ---- FILTRO DE PALABRAS VULGARES ----
-  const palabrasProhibidas = [
-    "verga", "mierda", "puta", "cabron", "gilipollas", "pendejo",
-    "fuck", "shit", "bitch", "asshole", "damn",
-    "vrg", "mrd", "pt", "cbn", "mmg", "pndj", "hdp", "monda", "caremonda", "pija", "pene", "maricon", "canalla", "callate" // iniciales
-    // Agrega todas las demás que quieras
-  ];
-
-  const frasesCristianas = [
-    "✝️ Por favor, usa palabras limpias y agradables a Dios.",
-    "🙏 Recuerda hablar con amor y respeto según la Palabra de Dios.",
-    "💒 Usa un lenguaje que bendiga a los demás, no palabras feas.",
-    "🕊️ Habla como hijo/a de Dios, con palabras de paz y amor."
-  ];
-
-  for (const palabra of palabrasProhibidas) {
-    if (msg.content.toLowerCase().includes(palabra)) {
-      const frase = frasesCristianas[Math.floor(Math.random() * frasesCristianas.length)];
-      msg.delete().catch(() => {});
-      msg.channel.send(`${frase} ✝️`);
-      return;
-    }
   }
 });
 
