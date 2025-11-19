@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, Partials, PermissionsBitField } = require("discord.js");
+const { Client, GatewayIntentBits, Partials, PermissionsBitField, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const express = require("express");
 
 // ---- SERVIDOR EXPRESS PARA QUE EL BOT NO SE APAGUE ----
@@ -28,12 +28,42 @@ bot.on("ready", () => {
 
 // ---- MENSAJE DE BIENVENIDA ----
 bot.on("guildMemberAdd", member => {
-  const canal = bot.channels.cache.get("1440511721205661706"); // <- Pega aquí el ID de tu canal
-  if (!canal) return;
+  const canalBienvenida = bot.channels.cache.get("1440511721205661706"); // <- ID canal de bienvenida
+  const canalReglas = bot.channels.cache.get("1440511929566232676"); // <- ID canal de reglas
+  if (!canalBienvenida || !canalReglas) return;
 
-  canal.send(
+  // Mensaje normal de bienvenida
+  canalBienvenida.send(
     `🙌 **Dios te bendiga, ${member.user.username}**\n¡Dios te bendiga! ¡Bienvenido/a a la familia de hermanos en Cristo! ✝️🔥`
   );
+
+  // Botón que lleva a las reglas
+  const filaBienvenida = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setLabel("Revisa las reglas aquí")
+      .setStyle(ButtonStyle.Link)
+      .setURL(`https://discord.com/channels/${member.guild.id}/${canalReglas.id}`)
+  );
+
+  canalBienvenida.send({
+    content: "📜 Antes de empezar, por favor lee las reglas:",
+    components: [filaBienvenida]
+  });
+
+  // Botón en canal de reglas que lleva al canal general
+  const canalGeneral = bot.channels.cache.get("1440502884545462375"); // <- ID canal general
+  if (canalGeneral) {
+    const filaReglas = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setLabel("Ya leí las reglas, ve al general")
+        .setStyle(ButtonStyle.Link)
+        .setURL(`https://discord.com/channels/${member.guild.id}/${canalGeneral.id}`)
+    );
+    canalReglas.send({
+      content: "✅ Una vez que leas las reglas, puedes ir al canal general:",
+      components: [filaReglas]
+    });
+  }
 });
 
 // ---- COMANDOS ----
@@ -68,7 +98,6 @@ bot.on("messageCreate", msg => {
       "📖 Todo lo puedo en Cristo que me fortalece. — Filipenses 4:13",
       "📖 Jehová es mi luz y mi salvación; ¿de quién temeré? — Salmos 27:1",
       "📖 Clama a mí y yo te responderé. — Jeremías 33:3"
-      // Puedes añadir más versículos aquí
     ];
     msg.reply(vers[Math.floor(Math.random() * vers.length)]);
   }
@@ -80,7 +109,6 @@ bot.on("messageCreate", msg => {
       "🙏 Padre Celestial, protégenos y acompáñanos en cada paso que damos, en el nombre de nuestro Señor Jesucristo, amén.",
       "🙏 Que Tu luz ilumine nuestro camino, que Tu amor nos guíe, en el nombre de Jesús, amén.",
       "🙏 Señor, gracias por tu misericordia y tu gracia, ayúdanos a caminar rectamente, en el nombre de nuestro Señor Jesucristo, amén."
-      // Puedes añadir más oraciones aquí
     ];
     msg.reply(oraciones[Math.floor(Math.random() * oraciones.length)]);
   }
@@ -106,5 +134,5 @@ bot.on("messageCreate", msg => {
   }
 });
 
-// ---- INICIAR BOT ----
+// ---- BOT LOGIN ----
 bot.login(process.env.TOKEN || "AQUÍ_PARA_PROBAR_LOCAL");
