@@ -114,9 +114,9 @@ bot.on("messageCreate", async msg => {
   }
 
   // --- GOSPEL AI: PREGUNTAS ---
-  // === AQUÍ ESTÁ TU GOSPEL AI ===
   if (msg.content.startsWith("!preguntar")) {
-    const pregunta = msg.content.replace("!preguntar", "").trim();
+    // 🔹 CORRECCIÓN: tomar solo la pregunta después del comando
+    const pregunta = msg.content.slice("!preguntar".length).trim();
 
     if (!pregunta) {
       return msg.reply("✝️ Escribe una pregunta. Ejemplo: `!preguntar ¿Qué significa tener fe?`");
@@ -191,9 +191,6 @@ bot.on("messageCreate", async msg => {
 
 // ---- BOT LOGIN ----
 bot.login(process.env.TOKEN || "AQUÍ_PARA_PROBAR_LOCAL");
-
-
-
 
 // ==============================
 // ⚠️ EXTRA AÑADIDO (SIN CAMBIAR NADA)
