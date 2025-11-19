@@ -97,7 +97,7 @@ bot.on("messageCreate", msg => {
   const palabrasProhibidas = [
     "verga", "mierda", "puta", "cabron", "gilipollas", "pendejo",
     "fuck", "shit", "bitch", "asshole", "damn",
-    "vrg", "mrd", "pt", "cbn", "gll", "pndj" // iniciales
+    "vrg", "mrd", "pt", "cbn", "mmg", "pndj", "hdp", "monda", "caremonda", "pija", "pene", "maricon", "canalla", "callate" // iniciales
     // Agrega todas las demás que quieras
   ];
 
