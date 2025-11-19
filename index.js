@@ -38,6 +38,7 @@ bot.on("guildMemberAdd", member => {
     .setDescription(`Bienvenido/a **${member}** ✝️🔥\nEres parte de una familia en Cristo. ¡Nos alegra que estés aquí!`)
     .setColor("#2ECC71")
     .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+    .setImage("https://i.imgur.com/3ZQ3ZQp.jpeg")  // <<< FONDO CRISTIANO AÑADIDO AQUÍ
     .setFooter({ text: "IPUL República Dominicana ✝️" });
 
   canalBienvenida.send({ embeds: [embedBienvenida] });
@@ -78,7 +79,7 @@ bot.on("guildMemberAdd", member => {
 
 // ---- MENSAJE DE DESPEDIDA ----
 bot.on("guildMemberRemove", member => {
-  const canalDespedida = bot.channels.cache.get("1440511965276409918"); // <- Pega aquí el ID de tu canal de despedida
+  const canalDespedida = bot.channels.cache.get("1440511965276409918");
   if (!canalDespedida) return;
 
   canalDespedida.send(
@@ -168,7 +169,7 @@ bot.on("messageCreate", msg => {
   }
 
   // !saludo
-  if (msg.content === ";!saludo") {
+  if (msg.content === "!saludo") {
     msg.reply("👋 ¡Hola! Que Dios te bendiga hoy y siempre ✝️");
   }
 
