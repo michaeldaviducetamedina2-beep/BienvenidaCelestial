@@ -34,22 +34,22 @@ bot.on("ready", () => {
 
 // ---- MENSAJE DE BIENVENIDA ----
 bot.on("guildMemberAdd", member => {
-  const canalBienvenida = bot.channels.cache.get("1440511721205661706"); 
-  const canalReglas = bot.channels.cache.get("1440511929566232676");
-  if (!canalBienvenida || !canalReglas) return;
+  const canalBienvenida = bot.channels.cache.get("1440511721205661706");   
+  const canalReglas = bot.channels.cache.get("1440511929566232676");  
+  if (!canalBienvenida || !canalReglas) return;  
 
   const embedBienvenida = new EmbedBuilder()
     .setTitle("🙌 ¡Dios te bendiga!")
-    .setDescription(`Bienvenido/a **${member}** ✝️🔥\nEres parte de una familia en Cristo. ¡Nos alegra que estés aquí!`)
+    .setDescription(`Bienvenido/a <@${member.id}> ✝️🔥\nEres parte de una familia en Cristo. ¡Nos alegra que estés aquí!`)
     .setColor("#2ECC71")
     .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
-    .setImage("https://i.imgur.com/3ZQ3ZQp.jpeg")
+    .setImage("https://i.imgur.com/l9gU5VP.jpeg") // Imagen cristiana de fondo (cruz)
     .setFooter({ text: "IPUL República Dominicana ✝️" });
 
   canalBienvenida.send({ embeds: [embedBienvenida] });
 
   canalBienvenida.send(
-    `🙌 **Dios te bendiga, ${member}**\n¡Bienvenido/a a la familia de hermanos en Cristo! ✝️🔥`
+    `🙌 **Dios te bendiga, <@${member.id}>**\n¡Bienvenido/a a la familia de hermanos en Cristo! ✝️🔥`
   );
 
   const filaBienvenida = new ActionRowBuilder().addComponents(
@@ -84,9 +84,15 @@ bot.on("guildMemberRemove", member => {
   const canalDespedida = bot.channels.cache.get("1440511965276409918");
   if (!canalDespedida) return;
 
-  canalDespedida.send(
-    `😢 ${member.user.tag} ha salido del servidor. Que Dios lo bendiga y lo guíe siempre ✝️🙏`
-  );
+  const embedDespedida = new EmbedBuilder()
+    .setTitle("😢 Adiós y que Dios te bendiga")
+    .setDescription(`<@${member.id}> ha salido del servidor. Que Dios lo guíe y le bendiga siempre ✝️🙏`)
+    .setColor("#E74C3C")
+    .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+    .setImage("https://i.imgur.com/l9gU5VP.jpeg") // Imagen cristiana de fondo (cruz)
+    .setFooter({ text: "IPUL República Dominicana ✝️" });
+
+  canalDespedida.send({ embeds: [embedDespedida] });
 });
 
 // ---- COMANDOS ----
@@ -113,7 +119,7 @@ bot.on("messageCreate", async msg => {
     return;
   }
 
-  // --- GOSPEL AI: PREGUNTAS ----
+  // --- GOSPEL AI: PREGUNTAS ---
   if (msg.content.startsWith("!preguntar")) {
     const pregunta = msg.content.replace("!preguntar", "").trim();
 
@@ -124,21 +130,14 @@ bot.on("messageCreate", async msg => {
     msg.channel.send("⏳ Orando y buscando sabiduría... ✝️");
 
     try {
-      // ---- Aquí está la corrección para respuestas dinámicas y sin repetirse ----
-      const respuesta = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "user",
-            content: `Responde como un consejero cristiano pentecostal amable de la IPULRD: ${pregunta}`
-          }
-        ],
-        temperature: 0.8
+      const respuesta = await openai.responses.create({
+        model: "gpt-4.1-mini",
+        input: `Responde como un consejero cristiano pentecostal amable de la IPULRD: ${pregunta}`
       });
 
-      const texto = respuesta.choices[0].message.content.trim(); // <- solo una vez
-      msg.reply("📖 **Respuesta basada en la Biblia:**\n" + texto);
+      const texto = respuesta.output[0].content[0].text;
 
+      msg.reply("📖 **Respuesta basada en la Biblia:**\n" + texto);
     } catch (err) {
       console.error(err);
       msg.reply("❌ Hubo un error buscando la respuesta, mi hermano.");
