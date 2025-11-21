@@ -34,22 +34,22 @@ bot.on("ready", () => {
 
 // ---- MENSAJE DE BIENVENIDA ----
 bot.on("guildMemberAdd", member => {
-  const canalBienvenida = bot.channels.cache.get("1440511721205661706");   
-  const canalReglas = bot.channels.cache.get("1440511929566232676");  
-  if (!canalBienvenida || !canalReglas) return;  
+  const canalBienvenida = bot.channels.cache.get("1440511721205661706"); 
+  const canalReglas = bot.channels.cache.get("1440511929566232676");
+  if (!canalBienvenida || !canalReglas) return;
 
   const embedBienvenida = new EmbedBuilder()
     .setTitle("🙌 ¡Dios te bendiga!")
-    .setDescription(`Bienvenido/a <@${member.id}> ✝️🔥\nEres parte de una familia en Cristo. ¡Nos alegra que estés aquí!`)
+    .setDescription(`Bienvenido/a **${member}** ✝️🔥\nEres parte de una familia en Cristo. ¡Nos alegra que estés aquí!`)
     .setColor("#2ECC71")
     .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
-    .setImage("https://i.imgur.com/l9gU5VP.jpeg") // Imagen cristiana de fondo (cruz)
+    .setImage("https://i.imgur.com/3ZQ3ZQp.jpeg")
     .setFooter({ text: "IPUL República Dominicana ✝️" });
 
   canalBienvenida.send({ embeds: [embedBienvenida] });
 
   canalBienvenida.send(
-    `🙌 **Dios te bendiga, <@${member.id}>**\n¡Bienvenido/a a la familia de hermanos en Cristo! ✝️🔥`
+    `🙌 **Dios te bendiga, ${member}**\n¡Bienvenido/a a la familia de hermanos en Cristo! ✝️🔥`
   );
 
   const filaBienvenida = new ActionRowBuilder().addComponents(
@@ -84,20 +84,14 @@ bot.on("guildMemberRemove", member => {
   const canalDespedida = bot.channels.cache.get("1440511965276409918");
   if (!canalDespedida) return;
 
-  const embedDespedida = new EmbedBuilder()
-    .setTitle("😢 Adiós y que Dios te bendiga")
-    .setDescription(`<@${member.id}> ha salido del servidor. Que Dios lo guíe y le bendiga siempre ✝️🙏`)
-    .setColor("#E74C3C")
-    .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
-    .setImage("https://i.imgur.com/l9gU5VP.jpeg") // Imagen cristiana de fondo (cruz)
-    .setFooter({ text: "IPUL República Dominicana ✝️" });
-
-  canalDespedida.send({ embeds: [embedDespedida] });
+  canalDespedida.send(
+    `😢 ${member.user.tag} ha salido del servidor. Que Dios lo bendiga y lo guíe siempre ✝️🙏`
+  );
 });
 
-// ---- COMANDOS ----
+// ---- COMANDOS Y FILTROS ----
 bot.on("messageCreate", async msg => {
-  if (msg.author.bot) return;
+  if (msg.author.bot && msg.author.id === bot.user.id) return;
 
   // ---- FILTRO DE PALABRAS ----
   const palabrasProhibidas = [
@@ -119,7 +113,28 @@ bot.on("messageCreate", async msg => {
     return;
   }
 
-  // --- GOSPEL AI: PREGUNTAS ---
+  // ---- TRADUCCIÓN AUTOMÁTICA ----
+  if (msg.author.bot && !msg.webhookId && msg.author.id !== bot.user.id) {
+    try {
+      const textoOriginal = msg.content;
+
+      const esIngles = /[a-zA-Z]/.test(textoOriginal) && !/[áéíóúñ¡¿]/.test(textoOriginal);
+      if (!esIngles) return;
+
+      const traduccion = await openai.responses.create({
+        model: "gpt-4.1-mini",
+        input: `Traduce al español este texto manteniendo el sentido cristiano si aplica: ${textoOriginal}`
+      });
+
+      const textoTraducido = traduccion.output[0].content[0].text;
+
+      msg.channel.send(`📘 **Mensaje traducido:**\n${textoTraducido} ✝️🔥`);
+    } catch (error) {
+      console.log("Error traduciendo mensaje:", error);
+    }
+  }
+
+  // --- GOSPEL AI: !preguntar ---
   if (msg.content.startsWith("!preguntar")) {
     const pregunta = msg.content.replace("!preguntar", "").trim();
 
@@ -144,7 +159,55 @@ bot.on("messageCreate", async msg => {
     }
   }
 
-  // --- COMANDOS YA EXISTENTES ---
+  // =======================================================
+  // === NUEVOS COMANDOS GOSPEL AI (AÑADIDOS POR TI) =======
+  // =======================================================
+
+  // --- !existeDios ---
+  if (msg.content.startsWith("!existeDios")) {
+    msg.channel.send("⏳ Buscando evidencia... ✝️");
+
+    const respuesta = await openai.responses.create({
+      model: "gpt-4.1-mini",
+      input: `Explica por qué Dios existe sin usar la Biblia, usando lógica, ciencia y filosofía, como un cristiano pentecostal.`
+    });
+
+    msg.reply("📘 **¿Cómo sabemos que Dios existe?**\n" + respuesta.output[0].content[0].text);
+  }
+
+  // --- !biblia <tema> ---
+  if (msg.content.startsWith("!biblia")) {
+    const tema = msg.content.replace("!biblia", "").trim();
+
+    if (!tema) return msg.reply("✝️ Ejemplo: `!biblia fe`");
+
+    const respuesta = await openai.responses.create({
+      model: "gpt-4.1-mini",
+      input: `Dame un versículo de la Biblia explicando el tema '${tema}' como un predicador pentecostal.`
+    });
+
+    msg.reply("📖 **Versículo sobre " + tema + ":**\n" + respuesta.output[0].content[0].text);
+  }
+
+  // --- !consejo <tema> ---
+  if (msg.content.startsWith("!consejo")) {
+    const tema = msg.content.replace("!consejo", "").trim();
+    if (!tema) return msg.reply("✝️ Ejemplo: `!consejo tristeza`");
+
+    const respuesta = await openai.responses.create({
+      model: "gpt-4.1-mini",
+      input: `Da un consejo cristiano pentecostal sobre el tema '${tema}'.`
+    });
+
+    msg.reply("💬 **Consejo:**\n" + respuesta.output[0].content[0].text);
+  }
+
+  // =======================================================
+  // === FIN DE LOS COMANDOS NUEVOS ========================
+  // =======================================================
+
+  // --- COMANDOS NORMALES ---
+
   if (msg.content === "!versiculo") {
     const vers = [
       "📖 Jehová es mi pastor; nada me faltará. — Salmos 23:1",
@@ -182,7 +245,7 @@ bot.on("messageCreate", async msg => {
   }
 
   if (msg.content === "!cmds") {
-    msg.reply("📜 **Comandos:**\n!versiculo\n!oracion\n!ipul\n!limpiar\n!saludo\n!ayuda\n!cmds\n!preguntar <tu pregunta>");
+    msg.reply("📜 **Comandos:**\n!versiculo\n!oracion\n!ipul\n!limpiar\n!saludo\n!ayuda\n!cmds\n!preguntar <tu pregunta>\n!biblia <tema>\n!consejo <tema>\n!existeDios");
   }
 
   if (msg.content === "!saludo") {
@@ -197,9 +260,6 @@ bot.on("messageCreate", async msg => {
 // ---- BOT LOGIN ----
 bot.login(process.env.TOKEN || "AQUÍ_PARA_PROBAR_LOCAL");
 
-// ==============================
-// ⚠️ EXTRA AÑADIDO (SIN CAMBIAR NADA)
-// Esto es SOLO para que Render no crashee
-// ==============================
+// ---- EVITAR CRASHEO ----
 process.on("uncaughtException", err => console.log("Error controlado:", err));
 process.on("unhandledRejection", err => console.log("Promesa rechazada:", err));
