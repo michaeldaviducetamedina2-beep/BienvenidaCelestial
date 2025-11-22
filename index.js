@@ -86,7 +86,7 @@ bot.on("messageCreate", async msg => {
   const palabrasProhibidas = [
     "verga", "vrg", "puta", "mierda", "fuck", "shit", "pendejo", "idiota", "imbecil", "cabron",
     "culero", "maldito", "penis", "vagina", "xxx", "sex", "sexo", "puta madre", "asshole", "bitch",
-    "mrd", "hdp", "maricon", "callate", "mamahuevo", "mmg", "wtf"
+    "mrd", "hdp", "maricon", "callate", "mamahuevo", "mmg", "wtf", "wth"
   ];
 
   const mensajeMinuscula = msg.content.toLowerCase();
