@@ -4,10 +4,10 @@ const express = require("express");
 // === IMPORTAR OPENAI (GOSPEL AI) ===
 const OpenAI = require("openai");
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY // <- AQUÍ PONES TU API KEY EN RENDER
+  apiKey: process.env.OPENAI_API_KEY 
 });
 
-// ---- SERVIDOR EXPRESS PARA QUE EL BOT NO SE APAGUE ----
+// ---- SERVIDOR EXPRESS ----
 const app = express();
 app.get("/", (req, res) => res.send("Bot funcionando correctamente ✝️🔥"));
 app.listen(process.env.PORT || 3000);
@@ -113,28 +113,7 @@ bot.on("messageCreate", async msg => {
     return;
   }
 
-  // ---- TRADUCCIÓN AUTOMÁTICA ----
-  if (msg.author.bot && !msg.webhookId && msg.author.id !== bot.user.id) {
-    try {
-      const textoOriginal = msg.content;
-
-      const esIngles = /[a-zA-Z]/.test(textoOriginal) && !/[áéíóúñ¡¿]/.test(textoOriginal);
-      if (!esIngles) return;
-
-      const traduccion = await openai.responses.create({
-        model: "gpt-4.1-mini",
-        input: `Traduce al español este texto manteniendo el sentido cristiano si aplica: ${textoOriginal}`
-      });
-
-      const textoTraducido = traduccion.output[0].content[0].text;
-
-      msg.channel.send(`📘 **Mensaje traducido:**\n${textoTraducido} ✝️🔥`);
-    } catch (error) {
-      console.log("Error traduciendo mensaje:", error);
-    }
-  }
-
-  // --- GOSPEL AI: !preguntar ---
+  // --- !preguntar ---
   if (msg.content.startsWith("!preguntar")) {
     const pregunta = msg.content.replace("!preguntar", "").trim();
 
@@ -142,11 +121,9 @@ bot.on("messageCreate", async msg => {
       return msg.reply("✝️ Escribe una pregunta. Ejemplo: `!preguntar ¿Qué significa tener fe?`");
     }
 
-    msg.channel.send("⏳ Orando y buscando sabiduría... ✝️");
-
     try {
       const respuesta = await openai.responses.create({
-        model: "gpt-4.1-mini",
+        model: "gpt-4o-mini",
         input: `Responde como un consejero cristiano pentecostal amable de la IPULRD: ${pregunta}`
       });
 
@@ -159,20 +136,19 @@ bot.on("messageCreate", async msg => {
     }
   }
 
-  // =======================================================
-  // === NUEVOS COMANDOS GOSPEL AI (AÑADIDOS POR TI) =======
-  // =======================================================
-
   // --- !existeDios ---
   if (msg.content.startsWith("!existeDios")) {
-    msg.channel.send("⏳ Buscando evidencia... ✝️");
+    try {
+      const respuesta = await openai.responses.create({
+        model: "gpt-4o-mini",
+        input: `Explica por qué Dios existe sin usar la Biblia, usando lógica, ciencia y filosofía, como un cristiano pentecostal.`
+      });
 
-    const respuesta = await openai.responses.create({
-      model: "gpt-4.1-mini",
-      input: `Explica por qué Dios existe sin usar la Biblia, usando lógica, ciencia y filosofía, como un cristiano pentecostal.`
-    });
-
-    msg.reply("📘 **¿Cómo sabemos que Dios existe?**\n" + respuesta.output[0].content[0].text);
+      msg.reply("📘 **¿Cómo sabemos que Dios existe?**\n" + respuesta.output[0].content[0].text);
+    } catch (err) {
+      console.error(err);
+      msg.reply("❌ Error buscando la respuesta, mi hermano.");
+    }
   }
 
   // --- !biblia <tema> ---
@@ -182,7 +158,7 @@ bot.on("messageCreate", async msg => {
     if (!tema) return msg.reply("✝️ Ejemplo: `!biblia fe`");
 
     const respuesta = await openai.responses.create({
-      model: "gpt-4.1-mini",
+      model: "gpt-4o-mini",
       input: `Dame un versículo de la Biblia explicando el tema '${tema}' como un predicador pentecostal.`
     });
 
@@ -195,19 +171,14 @@ bot.on("messageCreate", async msg => {
     if (!tema) return msg.reply("✝️ Ejemplo: `!consejo tristeza`");
 
     const respuesta = await openai.responses.create({
-      model: "gpt-4.1-mini",
+      model: "gpt-4o-mini",
       input: `Da un consejo cristiano pentecostal sobre el tema '${tema}'.`
     });
 
     msg.reply("💬 **Consejo:**\n" + respuesta.output[0].content[0].text);
   }
 
-  // =======================================================
-  // === FIN DE LOS COMANDOS NUEVOS ========================
-  // =======================================================
-
   // --- COMANDOS NORMALES ---
-
   if (msg.content === "!versiculo") {
     const vers = [
       "📖 Jehová es mi pastor; nada me faltará. — Salmos 23:1",
@@ -229,7 +200,7 @@ bot.on("messageCreate", async msg => {
   }
 
   if (msg.content === "!ipul") {
-    msg.reply("🔥 La Iglesia Pentecostal Unida Latinoamericana (IPUL) enseña la importancia del bautismo en el Nombre de Jesús, la santidad personal y vivir guiados por el Espíritu Santo. Nuestra misión es compartir el evangelio y ayudar a todos a acercarse a Cristo.");
+    msg.reply("🔥 La Iglesia Pentecostal Unida Latinoamericana (IPUL) enseña la importancia del bautismo en el Nombre de Jesús, la santidad personal y vivir guiados por el Espíritu Santo.");
   }
 
   if (msg.content.startsWith("!limpiar")) {
