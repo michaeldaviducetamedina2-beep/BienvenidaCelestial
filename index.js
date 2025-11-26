@@ -144,5 +144,10 @@ bot.on("messageCreate", async msg => {
 bot.login(process.env.TOKEN || "AQUÍ_PARA_PROBAR_LOCAL");
 
 // === ERRORES ===
-process.on("uncaughtException", err => console.log("Error controlado:", err));
-process.on("unhandledRejection", err => console.log("Promesa rechazada:", err
+process.on("uncaughtException", err => {
+  console.log("Error controlado:", err);
+});
+
+process.on("unhandledRejection", err => {
+  console.log("Promesa rechazada:", err);
+});
