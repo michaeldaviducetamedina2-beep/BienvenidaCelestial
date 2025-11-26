@@ -1,13 +1,8 @@
-// === CÓDIGO COMPLETO DEL BOT ARREGLADO ===
-// Incluye: !preguntar, !existeDios, imágenes de bienvenida/despedida,
-// y todas las funciones funcionando correctamente.
+// === CÓDIGO DEL BOT SIN COMANDOS DE IA ===
+// Mantiene bienvenida/despedida y todos los comandos normales
 
 const { Client, GatewayIntentBits, Partials, PermissionsBitField, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require("discord.js");
 const express = require("express");
-const OpenAI = require("openai");
-
-// === OPENAI ===
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // === EXPRESS ===
 const app = express();
@@ -46,7 +41,7 @@ bot.on("guildMemberAdd", member => {
     .setDescription(`Bienvenido/a **${member}** ✝️🔥\nNos alegra que estés aquí.`)
     .setColor("#2ECC71")
     .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
-    .setImage("https://i.imgur.com/6YV4M2Q.jpeg") // Imagen cristiana
+    .setImage("https://image.slidesdocs.com/responsive-images/background/glorious-3d-rendering-vibrant-sunrise-sky-illuminates-majestic-religious-cross-silhouette-powerpoint-background_b8ba8b6bbf__960_540.jpg") // Imagen cristiana NUEVA
     .setFooter({ text: "IPUL República Dominicana ✝️" });
 
   canalBienvenida.send({ embeds: [embedBienvenida] });
@@ -73,7 +68,7 @@ bot.on("guildMemberRemove", member => {
     .setTitle("🙏 Que Dios te guarde")
     .setDescription(`${member.user.tag} ha salido del servidor.`)
     .setColor("#E74C3C")
-    .setImage("https://i.imgur.com/uVX1u0p.jpeg"); // Imagen cristiana
+    .setImage("https://png.pngtree.com/thumb_back/fh260/background/20240916/pngtree-the-cross-on-hill-with-a-beautiful-sunrise-background-christian-concept-image_16216607.jpg"); // Imagen cristiana NUEVA
 
   canalDespedida.send({ embeds: [embedDespedida] });
 });
@@ -82,11 +77,11 @@ bot.on("guildMemberRemove", member => {
 bot.on("messageCreate", async msg => {
   if (msg.author.bot) return;
 
-  // === FILTRO ===
+  // === FILTRO DE PALABRAS ===
   const palabrasProhibidas = [
     "verga", "vrg", "puta", "mierda", "fuck", "shit", "pendejo", "idiota", "imbecil", "cabron",
     "culero", "maldito", "penis", "vagina", "xxx", "sex", "sexo", "puta madre", "asshole", "bitch",
-    "mrd", "hdp", "maricon", "callate", "mamahuevo", "mmg", "wtf", "wth"
+    "mrd", "hdp", "maricon", "callate", "mamahuevo", "mmg", "wtf", "wth" 
   ];
 
   const mensajeMinuscula = msg.content.toLowerCase();
@@ -94,55 +89,6 @@ bot.on("messageCreate", async msg => {
     msg.delete().catch(() => {});
     msg.channel.send("🙏 Usa palabras que edifiquen, Dios te bendiga ✝️");
     return;
-  }
-
-  // === !preguntar ===
-  if (msg.content.startsWith("!preguntar")) {
-    const pregunta = msg.content.replace("!preguntar", "").trim();
-
-    if (!pregunta)
-      return msg.reply("✝️ Ejemplo: `!preguntar ¿Qué es la fe?`");
-
-    try {
-      const respuesta = await openai.responses.create({
-        model: "gpt-4o-mini",
-        input: `Responde como un consejero cristiano pentecostal dominicano de la IPULRD: ${pregunta}`
-      });
-
-      msg.reply("📖 **Respuesta:**\n" + respuesta.output[0].content[0].text);
-    } catch (e) {
-      console.log(e);
-      msg.reply("❌ Hubo un error procesando la pregunta.");
-    }
-  }
-
-  // === !existeDios ===
-  if (msg.content === "!existeDios") {
-    try {
-      const r = await openai.responses.create({
-        model: "gpt-4o-mini",
-        input: "Explica por qué Dios existe sin usar la Biblia, usando lógica, ciencia y filosofía."
-      });
-
-      msg.reply("📘 **¿Cómo sabemos que Dios existe?**\n" + r.output[0].content[0].text);
-    } catch (e) {
-      msg.reply("❌ Error con la IA.");
-    }
-  }
-
-  // === !consejo ===
-  if (msg.content.startsWith("!consejo")) {
-    const tema = msg.content.replace("!consejo", "").trim();
-
-    if (!tema)
-      return msg.reply("✝️ Ejemplo: `!consejo tristeza`");
-
-    const respuesta = await openai.responses.create({
-      model: "gpt-4o-mini",
-      input: `Da un consejo cristiano pentecostal sobre el tema '${tema}'.`
-    });
-
-    msg.reply("💬 **Consejo:**\n" + respuesta.output[0].content[0].text);
   }
 
   // === !versiculo ===
@@ -187,7 +133,7 @@ bot.on("messageCreate", async msg => {
 
   // === !cmds ===
   if (msg.content === "!cmds") {
-    msg.reply("📜 **Comandos:**\n!preguntar <pregunta>\n!biblia <tema>\n!consejo <tema>\n!existeDios\n!versiculo\n!oracion\n!ipul\n!saludo\n!ayuda\n!limpiar");
+    msg.reply("📜 **Comandos:**\n!versiculo\n!oracion\n!ipul\n!saludo\n!ayuda\n!limpiar");
   }
 
   if (msg.content === "!saludo") msg.reply("👋 Dios te bendiga mucho ✝️");
@@ -199,4 +145,4 @@ bot.login(process.env.TOKEN || "AQUÍ_PARA_PROBAR_LOCAL");
 
 // === ERRORES ===
 process.on("uncaughtException", err => console.log("Error controlado:", err));
-process.on("unhandledRejection", err => console.log("Promesa rechazada:", err));
+process.on("unhandledRejection", err => console.log("Promesa rechazada:", err
